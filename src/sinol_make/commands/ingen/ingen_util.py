@@ -2,6 +2,7 @@ import stat
 import subprocess
 
 import argparse
+import glob
 import os
 
 from sinol_make import util
@@ -67,6 +68,22 @@ def compile_ingen(ingen_path: str, args: argparse.Namespace, compilation_flags='
         print(util.info('Successfully compiled ingen.'))
     return ingen_exe
 
+
+def find_static_tests(config=None):
+    if config == None: 
+        config = package_util.get_config()
+    
+    found_static_files = set()
+    if 'sinol_static_tests' not in config:
+        return set()
+    
+    static_patterns = config['sinol_static_tests']
+    if isinstance(static_patterns, str):
+        static_patterns = [static_patterns]
+    for static_pattern in static_patterns:
+        files = [os.path.basename(f) for f in glob.glob(os.path.join(os.getcwd(), "in", static_pattern))]
+        found_static_files.update(files)
+    return found_static_files
 
 def run_ingen(ingen_exe, working_dir=None):
     """
