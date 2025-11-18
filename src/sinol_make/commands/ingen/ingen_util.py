@@ -100,6 +100,9 @@ def run_ingen(ingen_exe, working_dir=None):
         st = os.stat(ingen_exe)
         os.chmod(ingen_exe, st.st_mode | stat.S_IEXEC)
 
+    with open(os.path.join(working_dir, ".sinol_static_tests"), "w") as static_tests_file:
+        static_tests_file.write("\n".join(find_static_tests()))
+    
     print(util.bold(' Ingen output '.center(util.get_terminal_size()[1], '=')))
     process = subprocess.Popen([ingen_exe], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                cwd=working_dir, shell=is_shell)
