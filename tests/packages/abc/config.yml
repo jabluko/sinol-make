@@ -1,4 +1,5 @@
 title: Simple test package
+sinol_static_tests: ["abc0.in abc1b.in"]
 memory_limit: 16000
 time_limit: 1000
 scores:

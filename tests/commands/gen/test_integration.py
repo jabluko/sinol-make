@@ -345,6 +345,18 @@ def test_dangling_inputs(create_package, capsys):
 
 
 @pytest.mark.parametrize("create_package", [util.get_simple_package_path()], indirect=True)
+def test_static_tests_file(create_package):
+    """
+    Test if static tests are written to .sinol_static_tests.
+    """
+    simple_run(command="ingen")
+    with open(os.path.join(create_package, ".sinol_static_tests"), "r") as f:
+        static_tests = {line.strip() for line in f if line.strip()}
+
+    assert static_tests == {"abc0.in", "abc1b.in"}
+
+
+@pytest.mark.parametrize("create_package", [util.get_simple_package_path()], indirect=True)
 def test_outgen_cache_cleaning(create_package, capsys):
     """
     Test if cache is cleaned after running outgen.
