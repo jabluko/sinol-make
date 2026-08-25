@@ -57,6 +57,7 @@ def compile_ingen(ingen_path: str, args: argparse.Namespace, compilation_flags='
         return ingen_path
 
     compilers = compiler.verify_compilers(args, [ingen_path])
+    print_config_for_ingen(prog_path=os.path.dirname(ingen_path))
     ingen_exe, compile_log_path = compile.compile_file(ingen_path, package_util.get_executable(ingen_path),
                                                        compilers, compilation_flags, use_sanitizers=use_sanitizers,
                                                        additional_flags='-D_INGEN', use_extras=False)
@@ -85,6 +86,21 @@ def find_static_tests(config=None):
         found_static_files.update(files)
     return found_static_files
 
+def format_string_list_for_cpp(list):
+    return ",\n".join([f'"{element}"' for element in list])
+
+def print_config_for_ingen(prog_path, config=None):
+    if config == None: 
+        config = package_util.get_config()
+
+    config_for_ingen = open(os.path.join(prog_path, "config.hpp"), "w")
+    config_for_ingen.write("""\
+#include <unordered_set>
+const std::unordered_set<std::string> static_test_names = {
+""" + format_string_list_for_cpp(find_static_tests()) + """
+};
+""")
+
 def run_ingen(ingen_exe, working_dir=None):
     """
     Runs ingen and generates all input files.
@@ -99,9 +115,6 @@ def run_ingen(ingen_exe, working_dir=None):
     if is_shell:
         st = os.stat(ingen_exe)
         os.chmod(ingen_exe, st.st_mode | stat.S_IEXEC)
-
-    with open(os.path.join(working_dir, ".sinol_static_tests"), "w") as static_tests_file:
-        static_tests_file.write("\n".join(find_static_tests()))
     
     print(util.bold(' Ingen output '.center(util.get_terminal_size()[1], '=')))
     process = subprocess.Popen([ingen_exe], stdout=subprocess.PIPE, stderr=subprocess.PIPE,

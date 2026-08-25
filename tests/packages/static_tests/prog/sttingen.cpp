@@ -1,22 +1,10 @@
 #include <bits/stdc++.h>
 #include "oi.h"
+#include "config.hpp"
 
 using namespace std;
 
 constexpr inline std::string_view task_id = "stt";
-
-[[nodiscard]] std::unordered_set<std::string> read_static_tests()
-{
-	std::unordered_set<std::string> output;
-	std::ifstream static_tests_file(".sinol_static_tests");
-	std::string test_name;
-	while (static_tests_file >> test_name)
-	{
-		output.insert(std::move(test_name));
-	}
-	return output;
-}
-const inline std::unordered_set<std::string> static_tests = read_static_tests();
 
 [[nodiscard]] std::string toLetters(size_t number)
 {
@@ -40,7 +28,7 @@ std::string get_test_name(size_t group_id, size_t test_id)
 
 size_t next_non_static(size_t group_id, size_t test_id)
 {
-	while (static_tests.contains(get_test_name(group_id, test_id)))
+	while (static_test_names.contains(get_test_name(group_id, test_id)))
 	{
 		++test_id;
 	}
